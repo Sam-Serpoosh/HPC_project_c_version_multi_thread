@@ -5,4 +5,4 @@ Here we we're doing a multi-threaded approach for optimization and speeding up t
 The result of timing this multi-threaded approach running 100 times repeatedly is
 as following:
 
-# Total Time --> 12.305s
+# Total Time --> 12.305s ??? WHY ???
