@@ -18,6 +18,7 @@ long _column_numbers;
 int** _similarity_matrix;
 long _row_numbers;
 pthread_t* _threads;
+pthread_cond_t* _signal_conds;
 pthread_mutex_t _mutex;
 
 // Methods

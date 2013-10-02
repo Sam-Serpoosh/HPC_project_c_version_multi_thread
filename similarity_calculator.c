@@ -9,6 +9,12 @@ void initialize(char* polymerase, char* sequence) {
 	_column_numbers = strlen(_sequence) + 1;
 	_row_numbers = strlen(_polymerase) + 1;
   _threads = malloc(_row_numbers * sizeof(pthread_t));
+  _signal_conds = malloc((_row_numbers - 1) * sizeof(pthread_cond_t));
+  int i;
+  for (i = 0; i < _row_numbers - 1; i++) {
+    pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+    _signal_conds[i] = cond;
+  }
 }
 
 void calculate_similarity() {
@@ -51,12 +57,13 @@ void* calculate_neighbors_values_in_row(void* arg) {
 	struct SimilarityMatrix* similarity_matrix = arg;
   int j;
 	for (j = 1; j < similarity_matrix->column_numbers; j++) {
-    //while (similarity_matrix->matrix[similarity_matrix->row_index][j - 1] == -1 || 
-     //      similarity_matrix->matrix[similarity_matrix->row_index - 1][j] == -1 ||
-      //     similarity_matrix->matrix[similarity_matrix->row_index - 1][j - 1] == -1) {
-//
- //   }
+    while (similarity_matrix->matrix[similarity_matrix->row_index][j - 1] == -1 || 
+           similarity_matrix->matrix[similarity_matrix->row_index - 1][j] == -1 ||
+           similarity_matrix->matrix[similarity_matrix->row_index - 1][j - 1] == -1) {
+      printf("Waiting!\n");
+    }
 
+    
     neighbor_values[0] = calculate_for_gap_in_polymerase(
         similarity_matrix->row_index, j);
     neighbor_values[1] = calculate_for_gap_in_sequence(
