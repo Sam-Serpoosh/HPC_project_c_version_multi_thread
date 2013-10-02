@@ -4,8 +4,8 @@
 char* read_file_content();
 
 int main(int argc, const char * argv[]) {
-  char* sequence = read_file_content("/Users/Sam/CppPrograms/HPC_project_c_version/HIV-1_db.fasta.txt");
-  char* polymerase = read_file_content("/Users/Sam/CppPrograms/HPC_project_c_version/HIV_polymerase.fasta.txt");
+  char* sequence = read_file_content("/Users/Sam/CppPrograms/HPC_project_c_version_multi_thread/HIV-1_db.fasta.txt");
+  char* polymerase = read_file_content("/Users/Sam/CppPrograms/HPC_project_c_version_multi_thread/HIV_polymerase.fasta.txt");
 
   initialize(polymerase, sequence);
   calculate_similarity();
