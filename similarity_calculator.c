@@ -30,9 +30,7 @@ void calculate_similarity() {
       printf("something went wrong on the thread %d", i);
       exit(1);
     }
-    thread_count++;
 	}
-  printf("Number of threads %d \n", thread_count); 
 
   for (i = 1; i < _row_numbers; i++) {
     if ((status = pthread_join(_threads[i], NULL)) != 0) {
@@ -59,9 +57,7 @@ void* calculate_neighbors_values_in_row(void* arg) {
 	for (j = 1; j < similarity_matrix->column_numbers; j++) {
     while (similarity_matrix->matrix[similarity_matrix->row_index][j - 1] == -1 || 
            similarity_matrix->matrix[similarity_matrix->row_index - 1][j] == -1 ||
-           similarity_matrix->matrix[similarity_matrix->row_index - 1][j - 1] == -1) {
-      printf("Waiting!\n");
-    }
+           similarity_matrix->matrix[similarity_matrix->row_index - 1][j - 1] == -1) { }
 
     
     neighbor_values[0] = calculate_for_gap_in_polymerase(
