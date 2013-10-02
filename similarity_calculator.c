@@ -8,23 +8,41 @@ void initialize(char* polymerase, char* sequence) {
 	_sequence = sequence;
 	_column_numbers = strlen(_sequence) + 1;
 	_row_numbers = strlen(_polymerase) + 1;
-  //_threads = malloc(_row_numbers * sizeof(pthread_t));
+  _threads = malloc(_row_numbers * sizeof(pthread_t));
 }
 
 void calculate_similarity() {
-	int neighbors_values[4];
-	neighbors_values[3] = MIN_VALUE;
 	initialize_similarity_matrix();
-	_sim_matrix.matrix = _similarity_matrix;
-	_sim_matrix.row_numbers = _row_numbers;
-	_sim_matrix.column_numbers = _column_numbers;
 
-
-  int i, status, thread_count;
+  int thread_count = 0;
+  int i, status;
 	for (i = 1; i < _row_numbers; i++) {
-    _sim_matrix.row_index = i;
-    calculate_neighbors_values_in_row((void*)&_sim_matrix);
+    struct SimilarityMatrix* sim_matrix = create_similarity_matrix();
+		sim_matrix->row_index = i;
+    if ((status = pthread_create(&_threads[i], NULL, 
+            calculate_neighbors_values_in_row, (void*)sim_matrix)) != 0) {
+      printf("something went wrong on the thread %d", i);
+      exit(1);
+    }
+    thread_count++;
 	}
+  printf("Number of threads %d \n", thread_count); 
+
+  for (i = 1; i < _row_numbers; i++) {
+    if ((status = pthread_join(_threads[i], NULL)) != 0) {
+      printf("join was NOT successful on thread 0");
+      exit(1);
+    }
+  }
+}
+
+struct SimilarityMatrix* create_similarity_matrix() {
+  struct SimilarityMatrix* sim_matrix = malloc(sizeof(struct SimilarityMatrix));
+	sim_matrix->matrix = _similarity_matrix;
+	sim_matrix->row_numbers = _row_numbers;
+	sim_matrix->column_numbers = _column_numbers;
+
+  return sim_matrix;
 }
 
 void* calculate_neighbors_values_in_row(void* arg) {
@@ -33,15 +51,21 @@ void* calculate_neighbors_values_in_row(void* arg) {
 	struct SimilarityMatrix* similarity_matrix = arg;
   int j;
 	for (j = 1; j < similarity_matrix->column_numbers; j++) {
-		neighbor_values[0] = calculate_for_gap_in_polymerase(
-				similarity_matrix->row_index, j);
-		neighbor_values[1] = calculate_for_gap_in_sequence(
-				similarity_matrix->row_index, j);
-		neighbor_values[2] = calculate_for_match_or_mismatch(
-				similarity_matrix->row_index, j);
+    //while (similarity_matrix->matrix[similarity_matrix->row_index][j - 1] == -1 || 
+     //      similarity_matrix->matrix[similarity_matrix->row_index - 1][j] == -1 ||
+      //     similarity_matrix->matrix[similarity_matrix->row_index - 1][j - 1] == -1) {
+//
+ //   }
 
-		similarity_matrix->matrix[similarity_matrix->row_index][j] = 
-			max(neighbor_values);
+    neighbor_values[0] = calculate_for_gap_in_polymerase(
+        similarity_matrix->row_index, j);
+    neighbor_values[1] = calculate_for_gap_in_sequence(
+        similarity_matrix->row_index, j);
+    neighbor_values[2] = calculate_for_match_or_mismatch(
+        similarity_matrix->row_index, j);
+
+    similarity_matrix->matrix[similarity_matrix->row_index][j] = 
+      max(neighbor_values);
 	}
 } 
 

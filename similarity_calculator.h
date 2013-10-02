@@ -15,12 +15,13 @@ void pretty_print();
 char* _polymerase;
 char* _sequence;
 long _column_numbers;
-struct SimilarityMatrix _sim_matrix;
 int** _similarity_matrix;
 long _row_numbers;
-//pthread_t* _threads;
+pthread_t* _threads;
+pthread_mutex_t _mutex;
 
 // Methods
+struct SimilarityMatrix* create_similarity_matrix();
 void initialize_similarity_matrix();
 void* calculate_neighbors_values_in_row(void* arg);
 void initialize_first_row();
